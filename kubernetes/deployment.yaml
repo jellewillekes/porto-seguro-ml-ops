@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: porto-seguro-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: porto-seguro
+  template:
+    metadata:
+      labels:
+        app: porto-seguro
+    spec:
+      containers:
+      - name: api
+        image: <YOUR_DOCKERHUB_USERNAME>/porto-seguro-api:latest
+        ports:
+        - containerPort: 8080
