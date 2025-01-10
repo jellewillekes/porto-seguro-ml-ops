@@ -1,11 +1,18 @@
+# Use a lightweight Python image
 FROM python:3.9-slim
 
+# Set the working directory inside the container
 WORKDIR /app
 
-COPY requirements.txt /app
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy the serving app and model files into the container
+COPY serving/ /app
+COPY models/ /app/models
 
-COPY . /app
+# Install serving-specific dependencies
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Example: run your training script
-CMD ["python", "scripts/train_model.py"]
+# Expose the port for the FastAPI application
+EXPOSE 8080
+
+# Command to run the FastAPI application
+CMD ["uvicorn", "predict:app", "--host", "0.0.0.0", "--port", "8080"]
