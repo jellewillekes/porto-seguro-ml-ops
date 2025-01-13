@@ -1,18 +1,21 @@
-# Use a lightweight Python image
-FROM python:3.9-slim
+FROM python:3.10-slim
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the serving app and model files into the container
-COPY serving/ /app
+# Copy serving script and model files
+COPY serving/ /app/serving
 COPY models/ /app/models
 
-# Install serving-specific dependencies
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install additional dependencies
+COPY serving/requirements.txt /app/
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Expose the port for the FastAPI application
+# Expose the port for the FastAPI app
 EXPOSE 8080
 
-# Command to run the FastAPI application
-CMD ["uvicorn", "predict:app", "--host", "0.0.0.0", "--port", "8080"]
+# Run the FastAPI app with Uvicorn
+CMD ["uvicorn", "serving.predict:app", "--host", "0.0.0.0", "--port", "8080"]
