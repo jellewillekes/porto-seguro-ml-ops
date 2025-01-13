@@ -90,7 +90,6 @@ def bayesian_optimization(X, y, init_points=10, n_iter=20, n_splits=5):
     return best_params, best_score
 
 
-# Train final model
 def train_and_save_best_model(X_train, y_train, X_test, y_test, best_params, model_name="xgboost"):
     model_folder = "models"
     os.makedirs(model_folder, exist_ok=True)
@@ -108,17 +107,32 @@ def train_and_save_best_model(X_train, y_train, X_test, y_test, best_params, mod
         random_state=42
     )
 
+    # Train the model
     model.fit(X_train, y_train)
+
+    # Evaluate the model
     y_pred_test = model.predict_proba(X_test)[:, 1]
     gini_test = normalized_gini(y_test, y_pred_test)
 
-    # Save model with test Gini in filename
+    # Save model
     model_filename = f"{model_name}_test_gini{gini_test:.4f}.pkl"
     model_path = os.path.join(model_folder, model_filename)
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)
 
+    # Save metadata
+    metadata = {
+        "n_features": X_train.shape[1],
+        "feature_names": list(X_train.columns),
+        "model_path": model_filename,
+    }
+    metadata_path = os.path.join(model_folder, "model_metadata.json")
+    with open(metadata_path, 'w') as f:
+        import json
+        json.dump(metadata, f)
+
     print(f"Model saved to {model_path} with Test Normalized Gini: {gini_test:.4f}")
+    print(f"Metadata saved to {metadata_path}")
     return model_path, gini_test
 
 
