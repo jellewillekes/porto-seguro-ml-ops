@@ -8,7 +8,7 @@ class TestPredictionEndpoint(unittest.TestCase):
     Unit test for testing the /predict endpoint of the FastAPI app.
     """
     API_URL = "http://localhost:8080/predict"
-    OBSERVATION_FILE = "../data/observation.csv"
+    OBSERVATION_FILE = "data/observation.csv"
 
     def setUp(self):
         """
