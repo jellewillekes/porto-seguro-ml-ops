@@ -1,8 +1,7 @@
 name: CD
-
 on:
   push:
-    branches: [ "main", "feature/update-cd" ]
+    branches: [ "main" ]
 
 jobs:
   deploy:
@@ -16,6 +15,14 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y conntrack
+
+      # Install crictl
+      - name: Install crictl
+        run: |
+          VERSION="v1.27.1" # Replace with the desired version
+          curl -LO https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+          sudo tar -C /usr/local/bin -xzf crictl-$VERSION-linux-amd64.tar.gz
+          rm -f crictl-$VERSION-linux-amd64.tar.gz
 
       # Install Minikube
       - name: Install Minikube
