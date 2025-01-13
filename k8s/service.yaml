@@ -4,9 +4,9 @@ metadata:
   name: porto-seguro-service
 spec:
   selector:
-    app: porto-seguro
+    app: porto-seguro-api
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-  type: LoadBalancer
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
+  type: NodePort
