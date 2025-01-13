@@ -86,15 +86,15 @@ docker build -t porto-seguro-api .
 
 #### Tag the Docker Image
 ```bash
-docker tag porto-seguro-api <your-dockerhub-username>/porto-seguro-api:latest
+docker tag porto-seguro-api jellewillekes/porto-seguro-api:latest
 ```
-Replace `<your-dockerhub-username>` with your actual Docker Hub username.
+Replace `jellewillekes` with your actual Docker Hub username.
 
 #### Push the Docker Image
 ```bash
-docker push <your-dockerhub-username>/porto-seguro-api:latest
+docker push jellewillekes/porto-seguro-api:latest
 ```
-Replace `<your-dockerhub-username>` with your actual Docker Hub username.
+Replace `jellewillekes` with your actual Docker Hub username.
 
 #### Run the Docker Container Locally
 ```bash
