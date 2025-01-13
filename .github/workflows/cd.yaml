@@ -30,3 +30,8 @@ jobs:
         run: |
           kubectl apply -f k8s/deployment.yaml
           kubectl apply -f k8s/service.yaml
+
+      - name: Validate Deployment
+        run: |
+          kubectl get pods
+          kubectl get svc
