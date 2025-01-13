@@ -1,20 +1,57 @@
 name: CD
+
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "feature/update-cd" ]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      # Step 1: Checkout the repository
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-      - name: Set up kubectl
+      # Step 2: Set up Docker and Kubernetes (Minikube)
+      - name: Install Minikube and kubectl
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y kubectl
+          curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+          chmod +x ./kubectl
+          sudo mv ./kubectl /usr/local/bin/kubectl
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          chmod +x minikube
+          sudo install minikube /usr/local/bin/
 
+      # Step 3: Start Minikube
+      - name: Start Minikube
+        run: |
+          sudo minikube start --driver=none
+          kubectl cluster-info
+
+      # Step 4: Authenticate Docker with Minikube
+      - name: Authenticate Docker
+        run: |
+          eval $(minikube -p minikube docker-env)
+
+      # Step 5: Build and Push Docker Image
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t jellewillekes/porto-seguro-api:latest .
+          docker push jellewillekes/porto-seguro-api:latest
+
+      # Step 6: Update Kubernetes Deployment
+      - name: Update Kubernetes Deployment
+        run: |
+          sed -i "s|image: .*|image: jellewillekes/porto-seguro-api:latest|" k8s/deployment.yaml
+
+      # Step 7: Apply Kubernetes Manifests
       - name: Deploy to Kubernetes
         run: |
-          kubectl apply -f kubernetes/deployment.yaml
-          kubectl apply -f kubernetes/service.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
+
+      # Step 8: Wait for Rollout
+      - name: Wait for Rollout
+        run: |
+          kubectl rollout status deployment/porto-seguro-api
