@@ -1,25 +1,34 @@
 name: CI Pipeline
-on: [ push, pull_request ]
+
+on:
+  push:
+    branches: [ main , feature/update-cd]
+  pull_request:
+    branches: [ main , feature/update-cd]
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout Code
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      # Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
+      # Step 3: Install Dependencies
       - name: Install Dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
         shell: bash
 
+      # Step 4: Start FastAPI Server
       - name: Start FastAPI Server
         run: |
           nohup uvicorn serving.predict:app --host 0.0.0.0 --port 8080 > server.log 2>&1 &
@@ -28,6 +37,7 @@ jobs:
           ENV: test
         shell: bash
 
+      # Step 5: Wait for FastAPI Server
       - name: Wait for FastAPI Server
         run: |
           for i in {1..10}; do
@@ -42,13 +52,30 @@ jobs:
           exit 1
         shell: bash
 
+      # Step 6: Run Unit Tests
       - name: Run Unit Tests
         run: python -m unittest discover -s tests -p "*.py"
         shell: bash
 
+      # Step 7: Kill FastAPI Server
       - name: Kill FastAPI Server
         if: always()
         run: |
           kill $(cat server_pid.txt)
           rm server_pid.txt
         shell: bash
+
+      # Step 8: Login to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      # Step 9: Build Docker Image
+      - name: Build Docker Image
+        run: docker build -t jellewillekes/porto-seguro-api:latest .
+
+      # Step 10: Push Docker Image to Docker Hub
+      - name: Push Docker Image to Docker Hub
+        run: docker push jellewillekes/porto-seguro-api:latest
