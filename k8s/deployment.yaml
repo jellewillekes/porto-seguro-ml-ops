@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: porto-seguro-api
+  labels:
+    app: porto-seguro
+    environment: production
+    team: data-science
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: porto-seguro
+  template:
+    metadata:
+      labels:
+        app: porto-seguro
+    spec:
+      containers:
+      - name: porto-seguro-api
+        image: jellewillekes/porto-seguro-api:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 5
+        env:
+        - name: ENV
+          value: production
+        - name: LOG_LEVEL
+          value: info
