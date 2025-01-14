@@ -157,7 +157,6 @@ Alternatively, use the `run_predict.py` script to send test requests:
 ```bash
 python scripts/run_predict.py
 ```
-
-The `data/observation.csv` file contains valid input data with 91 features.
-The model is deployed on Kubernetes and accessible through a LoadBalancer service.
+The `data/observation.csv` file contains input data with 91 features.
+The model is deployed on Kubernetes on a NodePort.
 ---
