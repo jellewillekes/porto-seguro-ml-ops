@@ -1,30 +1,25 @@
+## Porto Seguro MLOps Project
 
-# Porto Seguro MLOps Project
+This repository shows an example of an MLOps pipeline built for the Porto Seguro Safe Driver Prediction dataset. The project demonstrates how to train and deploy a machine learning model using open-source tools and frameworks, including Docker, Kubernetes, and FastAPI. The project serves as an example (and reference) for scalable and production-ready machine learning system design.
 
-This repository shows an example of an MLOps pipeline built for the Porto Seguro Safe Driver Prediction dataset. The 
-project demonstrates how to train and deploy a machine learning model using open-source tools and frameworks, including 
-Docker, Kubernetes, and FastAPI. The project serves as an example (and refer back) for a scalable and prodcution-ready 
-machine learning system design.
+### Overview
 
----
-
-## Overview
-
-### Porto Seguro Dataset
+#### Porto Seguro Dataset
 Predicting insurance risk scores is a critical task for reducing losses in the insurance industry. Using the Porto Seguro Safe Driver Prediction dataset, this project develops a machine learning model to predict the likelihood of claims, with an emphasis on high accuracy and operational scalability.
 
-### Key Features
-1. **Machine Learning Model**:
-   - The model is built using XGBoost and optimized using Bayesian Optimization.
-   - Performance is measured using the Gini coefficient, a common metric in risk prediction tasks.
-2. **Model Serving**:
-   - A FastAPI-based REST API serves predictions and provides health checks.
-3. **Scalability**:
-   - The application is containerized with Docker and deployed using Kubernetes.
+#### Key Features
 
----
+- **Machine Learning Model**:
+  - The model is built using XGBoost and optimized using Bayesian Optimization.
+  - Performance is measured using the Gini coefficient, a common metric in risk prediction tasks.
 
-## Project Structure
+- **Model Serving**:
+  - A FastAPI-based REST API serves predictions and provides health checks.
+
+- **Scalability**:
+  - The application is containerized with Docker and deployed using Kubernetes.
+
+### Project Structure
 ```
 porto-seguro-mlops/
 ├── data/                
@@ -45,119 +40,79 @@ porto-seguro-mlops/
 ├── README.txt              
 ├── requirements.txt      
 ```
----
 
-## Setup Instructions
+### Setup Instructions
 
-### Prerequisites
-Install and set up following programs:
+#### Prerequisites
+Install and set up the following programs:
 - Python 3.10+
 - Docker (Desktop)
 - Kubernetes (Minikube for local testing)
 - Git
 
----
-
-### Step 1: Clone the Repository
+#### Step 1: Clone the Repository
 ```bash
 git clone https://github.com/<your-username>/porto-seguro-mlops.git
 cd porto-seguro-mlops
 ```
 
----
-
-### Step 2: Train the Machine Learning Model
+#### Step 2: Train the Machine Learning Model
 Train and save the machine learning model with metadata:
 ```bash
 python scripts/train_model.py
 ```
 This will generate:
-- `models/xgboost_test_gini.pkl`: Serialized trained model.
+- `models/xgboost_gini.pkl`: Serialized trained model.
 - `models/model_metadata.json`: Metadata containing feature details.
 
----
+#### Step 3: Build and Run the Docker Container Locally
 
-### Step 3: Build and Run the Docker Container Locally
-
-#### Build the Docker Image
+**Build the Docker Image**:
 ```bash
 docker build -t porto-seguro-api .
 ```
 
-#### Tag the Docker Image
+**Tag the Docker Image**:
 ```bash
 docker tag porto-seguro-api jellewillekes/porto-seguro-api:latest
 ```
-Replace `jellewillekes` with your actual Docker Hub username.
+Replace `jellewillekes` with Docker Hub username where image is stored.
 
-#### Push the Docker Image
+**Push the Docker Image**:
 ```bash
 docker push jellewillekes/porto-seguro-api:latest
 ```
-Replace `jellewillekes` with your actual Docker Hub username.
 
-#### Run the Docker Container Locally
+**Run the Docker Container Locally**:
 ```bash
 docker run -p 8080:8080 porto-seguro-api
 ```
 
-#### Test the API
+**Test the API**:
 ```bash
 python scripts/run_predict.py
 ```
 
----
+### Using the Deployed Endpoint
 
-### Step 4: Deploy to Kubernetes
+The `data/observation.csv` file contains input data with 91 features. To use the deployed endpoint:
 
-#### Initialize Minikube
-To deploy the application using Kubernetes, first ensure Minikube is installed and configured. Start Minikube and set the Docker environment:
+1. Ensure the API is running and accessible. For Kubernetes deployment, retrieve the service URL:
+   ```bash
+   minikube service porto-seguro-service --url
+   ```
+   Replace `<SERVICE_URL>` below with the retrieved URL.
 
-```bash
-minikube start
-minikube docker-env
-```
+2. Send a request to the endpoint:
+   ```bash
+   curl -X POST -H "Content-Type: application/json" -d '{"features": [<list_of_91_features>]}' <SERVICE_URL>/predict
+   ```
+   Replace `<list_of_91_features>` with the actual feature values.
 
-#### Deploy Kubernetes Resources
-Apply the Kubernetes manifests to create and expose the deployment:
+3. Alternatively, use the provided script to send requests:
+   ```bash
+   python scripts/run_predict.py
+   ```
+   This script reads the input data from `data/observation.csv`, formats it, and sends a request to the endpoint.
 
-```bash
-kubectl apply -f k8s/deployment.yaml
-kubectl apply -f k8s/service.yaml
-```
-
-- `deployment.yaml` specifies the application deployment, including replicas, resource limits, and liveness/readiness probes.
-- `service.yaml` creates a LoadBalancer service to expose the application.
-
-#### Verify Deployment
-Ensure that the application is running by checking the status of pods:
-
-```bash
-kubectl get pods
-```
-
-#### Access the Deployed API
-Retrieve the external IP or NodePort of the service, command to get URL to access the deployed API.
-
-```bash
-minikube service porto-seguro-service --url
-```
-
-#### Test the Deployed API
-You can now send requests to the API, by using external IP or NodePortUse the external IP or NodePort:
-
-```bash
-curl -X POST -H "Content-Type: application/json" -d '{"features": [<list_of_91_features>]}' <EXTERNAL_IP>
-```
-
-Replace `<list_of_91_features>` with the actual feature values and `<EXTERNAL_IP>` with the service URL.
-
-Alternatively, use the `run_predict.py` script to send test requests:
-
-```bash
-python scripts/run_predict.py
-```
-
-The `data/observation.csv` file contains input data with 91 features.
-The model is deployed on Kubernetes on a NodePort.
----
+The response is a predicted likelihood of an insurance claim based on the provided features.
