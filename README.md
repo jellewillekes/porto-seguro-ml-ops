@@ -41,7 +41,7 @@ porto-seguro-mlops/
 │   ├── train_model.py      # Script to train the model
 │   ├── create_observation.py  
 │   ├── run_predict.py      # Script to test the FastAPI app
-├── Dockerfile              
+├── Dockerfile              # Image for teh serving app
 ├── README.txt              
 ├── requirements.txt      
 ```
@@ -72,7 +72,7 @@ Train and save the machine learning model with metadata:
 python scripts/train_model.py
 ```
 This will generate:
-- `models/xgboost_test_gini.pkl`: Serialized trained model.
+- `models/xgboost_gini.pkl`: Serialized trained model.
 - `models/model_metadata.json`: Metadata containing feature details.
 
 ---

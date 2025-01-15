@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def load_observation_and_predict():
-    url = "http://localhost:8080/predict"
+    url = "http://127.0.0.1:56920/predict"
     input_file = "data/observation.csv"
 
     try:

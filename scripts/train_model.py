@@ -115,7 +115,7 @@ def train_and_save_best_model(X_train, y_train, X_test, y_test, best_params, mod
     gini_test = normalized_gini(y_test, y_pred_test)
 
     # Save model
-    model_filename = f"{model_name}_test_gini{gini_test:.4f}.pkl"
+    model_filename = f"{model_name}_gini.pkl"
     model_path = os.path.join(model_folder, model_filename)
     with open(model_path, 'wb') as f:
         pickle.dump(model, f)

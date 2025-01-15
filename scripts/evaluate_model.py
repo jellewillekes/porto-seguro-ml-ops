@@ -15,7 +15,7 @@ from sklearn.metrics import (
 
 def main():
     # Load the saved model path (hard-coded or param)
-    model_path = "models/xgboost_test_gini0.2538.pkl"  # Example
+    model_path = "models/xgboost_gini.pkl"  # Example
     with open(model_path, 'rb') as f:
         model = pickle.load(f)
 

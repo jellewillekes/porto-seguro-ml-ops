@@ -13,7 +13,7 @@ class PredictionInput(BaseModel):
 
 
 # Load model and metadata
-model_path = "models/xgboost_test_gini0.2538.pkl"
+model_path = "models/xgboost_gini.pkl"
 metadata_path = "models/model_metadata.json"
 
 try:
