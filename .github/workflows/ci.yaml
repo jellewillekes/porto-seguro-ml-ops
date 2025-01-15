@@ -2,9 +2,9 @@ name: CI Pipeline
 
 on:
   push:
-    branches: [ main , feature/update-cd]
+    branches: [ main , feature/health-deployment]
   pull_request:
-    branches: [ main , feature/update-cd]
+    branches: [ main , feature/health-deployment]
 
 jobs:
   build-and-test:

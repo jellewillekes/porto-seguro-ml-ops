@@ -36,7 +36,7 @@ porto-seguro-mlops/
 │   ├── train_model.py      # Script to train the model
 │   ├── create_observation.py  
 │   ├── run_predict.py      # Script to test the FastAPI app
-├── Dockerfile              
+├── Dockerfile              # Image for teh serving app
 ├── README.txt              
 ├── requirements.txt      
 ```
